@@ -1,0 +1,43 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+.conda/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Experiment outputs
+results/
+runs/
+emissions.csv
+*.ckpt
+*.pth
+*.pt
+
+# Data
+data/
+datasets/
+
+# Docs build
+docs/_build/
+site/
+
+# Local claude settings
+.claude/settings.local.json
