@@ -5,7 +5,7 @@
 **Automatic energy, carbon, and performance profiling for AI training — with almost zero code changes.**
 
 [![CI](https://github.com/Shanmuk4622/e2am/actions/workflows/ci.yml/badge.svg)](https://github.com/Shanmuk4622/e2am/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -113,25 +113,32 @@ code changes to your training loop.
 ## CLI
 
 ```bash
-e2am hardware              # inspect detected hardware & energy capabilities
-e2am train config.yaml     # run a training experiment from config
-e2am benchmark model.py    # benchmark latency / throughput / energy
-e2am report results/run1   # regenerate reports for a run
-e2am compare run1 run2     # compare runs side by side
-e2am dashboard             # launch the interactive dashboard
+e2am hardware                                   # detected hardware & energy capabilities
+e2am train model.py --config config.yaml        # train with full telemetry
+e2am benchmark model.py --input-size 8,3,224,224  # FLOPs, latency, J/inference
+e2am report results/run1                        # regenerate reports for a run
+e2am compare results/run1 results/run2          # side-by-side comparison
+e2am dashboard                                  # local HTML dashboard of all runs
 ```
+
+`model.py` follows a tiny convention (see [examples/cli_model.py](examples/cli_model.py)):
+define `get_model()` and, for training, `get_loaders()`; optionally
+`get_optimizer(model)` and `get_loss()`.
 
 ## Roadmap
 
 - [x] Hardware detection with energy-capability probing
-- [ ] Background energy/carbon/utilization monitoring (`monitor()`)
-- [ ] FLOPs/MACs/latency profiler
-- [ ] Drop-in `Trainer` with callbacks & plugins
-- [ ] Automatic plots + HTML/PDF reports + leaderboard
-- [ ] CLI (`train`, `benchmark`, `report`, `compare`, `dashboard`)
+- [x] Background energy/carbon/utilization monitoring (`monitor()`)
+- [x] FLOPs/MACs/latency/peak-memory profiler
+- [x] Drop-in `Trainer` with callback lifecycle (AMP, grad accumulation, early stopping)
+- [x] Green AI metrics: energy/carbon per sample, accuracy/joule, Green Score, EAG
+- [x] Automatic plots + HTML/Markdown/PDF reports + leaderboard
+- [x] CLI (`hardware`, `train`, `benchmark`, `report`, `compare`, `dashboard`)
+- [x] Local HTML dashboard across runs
+- [ ] Plugin integrations (W&B, MLflow, TensorBoard, Slack/Discord)
 - [ ] Optimization engine (AMP, quantization, pruning, batch-size suggestions)
 - [ ] Distributed training support
-- [ ] Cloud dashboard & Hugging Face integration
+- [ ] Cloud dashboard & Hugging Face `transformers` integration
 
 ## Contributing
 

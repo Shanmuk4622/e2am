@@ -123,6 +123,10 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["B011"]
 
+[tool.ruff.lint.flake8-bugbear]
+# typer's declarative CLI style requires calls in argument defaults.
+extend-immutable-calls = ["typer.Argument", "typer.Option"]
+
 [tool.mypy]
 python_version = "3.10"
 warn_unused_ignores = true
