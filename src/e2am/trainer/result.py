@@ -25,6 +25,10 @@ class TrainingResult(BaseModel):
     status: str = Field(default="completed", description="'completed', 'stopped', or 'failed'.")
     epochs_requested: int = 0
     epochs_completed: int = 0
+    device: str = Field(default="", description="Device training ran on (e.g. 'cuda', 'cpu').")
+    mixed_precision: bool = Field(
+        default=False, description="Whether AMP (autocast + GradScaler) was active."
+    )
     samples_processed: int = Field(
         default=0, description="Total training samples seen across all epochs."
     )

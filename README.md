@@ -118,6 +118,7 @@ e2am train model.py --config config.yaml        # train with full telemetry
 e2am benchmark model.py --input-size 8,3,224,224  # FLOPs, latency, J/inference
 e2am report results/run1                        # regenerate reports for a run
 e2am compare results/run1 results/run2          # side-by-side comparison
+e2am optimize results/run1                      # efficiency suggestions + Wh savings
 e2am dashboard                                  # local HTML dashboard of all runs
 ```
 
@@ -160,7 +161,7 @@ Write your own by subclassing `e2am.trainer.Callback`.
 - [x] CLI (`hardware`, `train`, `benchmark`, `report`, `compare`, `dashboard`)
 - [x] Local HTML dashboard across runs
 - [x] Plugin integrations (W&B, MLflow, TensorBoard, Slack/Discord)
-- [ ] Optimization engine (AMP, quantization, pruning, batch-size suggestions)
+- [x] Optimization engine (`e2am optimize`: AMP, batch size, torch.compile, checkpointing, quantization, wasted-epoch detection with measured Wh savings)
 - [ ] Distributed training support
 - [ ] Cloud dashboard & Hugging Face `transformers` integration
 

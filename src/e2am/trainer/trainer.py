@@ -268,6 +268,8 @@ class Trainer:
                 status=status,
                 epochs_requested=self.epochs,
                 epochs_completed=epochs_completed,
+                device=str(self.device),
+                mixed_precision=self._use_amp,
                 samples_processed=samples_processed,
                 best_val_accuracy=best_val_acc,
                 best_epoch=best_epoch,

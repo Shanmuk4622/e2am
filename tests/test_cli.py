@@ -141,6 +141,42 @@ def test_compare_needs_two_runs(tmp_path: Path) -> None:
     assert result.exit_code == 1
 
 
+def test_optimize_command(tmp_path: Path) -> None:
+    from e2am.trainer.result import TrainingResult
+
+    training = TrainingResult(
+        project="p",
+        run_name="opt-run",
+        device="cuda",
+        mixed_precision=False,
+        epochs_requested=5,
+        epochs_completed=5,
+        history={
+            "val_accuracy": {"steps": [0, 1, 2, 3, 4], "values": [0.5, 0.8, 0.9, 0.9, 0.9]},
+            "cumulative_energy_wh": {
+                "steps": [0, 1, 2, 3, 4],
+                "values": [1.0, 2.0, 3.0, 4.0, 5.0],
+            },
+        },
+    )
+    run_dir = tmp_path / "opt-run"
+    run_dir.mkdir()
+    (run_dir / "metrics.json").write_text(training.model_dump_json(), encoding="utf-8")
+    result = runner.invoke(app, ["optimize", str(run_dir)])
+    assert result.exit_code == 0, result.output
+    assert "AMP" in result.output  # mixed-precision suggestion fired
+    assert "Quantified savings" in result.output
+
+
+def test_optimize_rejects_monitor_only_runs(monitor_result: MonitorResult, tmp_path: Path) -> None:
+    run_dir = tmp_path / "mon-run"
+    run_dir.mkdir()
+    (run_dir / "metrics.json").write_text(monitor_result.model_dump_json(), encoding="utf-8")
+    result = runner.invoke(app, ["optimize", str(run_dir)])
+    assert result.exit_code == 1
+    assert "training run" in result.output
+
+
 def test_dashboard_command(monitor_result: MonitorResult, tmp_path: Path) -> None:
     from e2am.reports.leaderboard import update_leaderboard
 

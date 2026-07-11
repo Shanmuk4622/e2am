@@ -231,6 +231,51 @@ def report(
 
 
 @app.command()
+def optimize(
+    run_dir: Path = typer.Argument(..., help="A run directory containing metrics.json."),
+) -> None:
+    """Suggest efficiency optimizations based on a run's measurements."""
+    from e2am.optimize import analyze
+    from e2am.trainer.result import TrainingResult
+
+    result = _load_result(run_dir)
+    if not isinstance(result, TrainingResult):
+        _fail(
+            "optimize needs a training run (metrics.json from e2am.Trainer); "
+            "this directory holds a monitoring-only run."
+        )
+        return
+    suggestions = analyze(result)
+    if not suggestions:
+        console.print(
+            "[green]No optimization opportunities detected[/green] — this run "
+            "already uses the measured hardware efficiently."
+        )
+        return
+    table = Table(
+        title=f"Optimization suggestions · {result.project} / {result.run_name}",
+        title_style="bold green",
+        show_lines=True,
+    )
+    table.add_column("Priority", style="bold", width=8)
+    table.add_column("Suggestion")
+    table.add_column("Estimated savings", justify="right")
+    colors = {"high": "red", "medium": "yellow", "low": "cyan"}
+    for s in suggestions:
+        table.add_row(
+            f"[{colors.get(s.priority, 'white')}]{s.priority}[/]",
+            f"[bold]{s.title}[/bold]\n{s.rationale}\n[dim]{s.action}[/dim]",
+            s.savings_label(),
+        )
+    console.print(table)
+    quantified = sum(s.estimated_savings_wh or 0 for s in suggestions)
+    if quantified > 0:
+        console.print(
+            f"[bold]Quantified savings from this run's own data: " f"~{quantified:.4g} Wh[/bold]"
+        )
+
+
+@app.command()
 def compare(
     run_dirs: list[Path] = typer.Argument(..., help="Two or more run directories."),
 ) -> None:
