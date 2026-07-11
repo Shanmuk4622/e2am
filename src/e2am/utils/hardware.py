@@ -14,7 +14,7 @@ from __future__ import annotations
 import platform
 import socket
 import sys
-from typing import List, Optional
+from typing import Any
 
 import psutil
 from pydantic import BaseModel, Field
@@ -39,9 +39,9 @@ class GPUInfo(BaseModel):
 
     index: int
     name: str = "Unknown GPU"
-    total_memory_mb: Optional[float] = None
-    driver_version: Optional[str] = None
-    power_limit_w: Optional[float] = Field(
+    total_memory_mb: float | None = None
+    driver_version: str | None = None
+    power_limit_w: float | None = Field(
         default=None,
         description="Enforced board power limit in watts (TDP proxy).",
     )
@@ -64,9 +64,9 @@ class CPUInfo(BaseModel):
     """Static description of the CPU."""
 
     model: str = "Unknown CPU"
-    physical_cores: Optional[int] = None
-    logical_cores: Optional[int] = None
-    max_frequency_mhz: Optional[float] = None
+    physical_cores: int | None = None
+    logical_cores: int | None = None
+    max_frequency_mhz: float | None = None
     tdp_w: float = Field(
         default=DEFAULT_CPU_TDP_W,
         description="Thermal design power used for energy estimation.",
@@ -92,10 +92,10 @@ class SystemInfo(BaseModel):
     hostname: str = ""
     cpu: CPUInfo = Field(default_factory=CPUInfo)
     ram: RAMInfo = Field(default_factory=RAMInfo)
-    gpus: List[GPUInfo] = Field(default_factory=list)
-    torch_version: Optional[str] = None
+    gpus: list[GPUInfo] = Field(default_factory=list)
+    torch_version: str | None = None
     cuda_available: bool = False
-    cuda_version: Optional[str] = None
+    cuda_version: str | None = None
 
     @property
     def gpu_count(self) -> int:
@@ -103,7 +103,7 @@ class SystemInfo(BaseModel):
         return len(self.gpus)
 
 
-def _detect_cpu(cpu_tdp_w: Optional[float]) -> CPUInfo:
+def _detect_cpu(cpu_tdp_w: float | None) -> CPUInfo:
     model = platform.processor() or platform.machine() or "Unknown CPU"
     freq = None
     try:
@@ -123,11 +123,13 @@ def _detect_cpu(cpu_tdp_w: Optional[float]) -> CPUInfo:
 
 def _detect_ram() -> RAMInfo:
     total_gb = psutil.virtual_memory().total / 2**30
-    return RAMInfo(total_gb=round(total_gb, 2), estimated_power_w=round(total_gb * RAM_WATTS_PER_GB, 2))
+    return RAMInfo(
+        total_gb=round(total_gb, 2), estimated_power_w=round(total_gb * RAM_WATTS_PER_GB, 2)
+    )
 
 
-def _detect_gpus() -> List[GPUInfo]:
-    gpus: List[GPUInfo] = []
+def _detect_gpus() -> list[GPUInfo]:
+    gpus: list[GPUInfo] = []
     with NVML() as nvml:
         if not nvml.available:
             return gpus
@@ -148,22 +150,32 @@ def _detect_gpus() -> List[GPUInfo]:
     return gpus
 
 
-def _detect_torch() -> tuple:
-    """Return (torch_version, cuda_available, cuda_version) without forcing a slow import.
+def _import_torch() -> Any:
+    """Return the torch module without forcing a slow import when absent.
 
-    Only inspects torch if it is already imported or installed; never raises.
+    Only imports torch if it is already loaded or installed; never raises.
     """
     torch = sys.modules.get("torch")
-    if torch is None:
-        try:
-            import importlib.util
+    if torch is not None:
+        return torch
+    try:
+        import importlib.util
 
-            if importlib.util.find_spec("torch") is None:
-                return None, False, None
-            import torch  # type: ignore[no-redef]
-        except Exception as exc:
-            logger.debug("torch inspection failed: %s", exc)
-            return None, False, None
+        if importlib.util.find_spec("torch") is None:
+            return None
+        import torch as torch_module
+
+        return torch_module
+    except Exception as exc:
+        logger.debug("torch inspection failed: %s", exc)
+        return None
+
+
+def _detect_torch() -> tuple[str | None, bool, str | None]:
+    """Return (torch_version, cuda_available, cuda_version); never raises."""
+    torch = _import_torch()
+    if torch is None:
+        return None, False, None
     try:
         cuda_available = bool(torch.cuda.is_available())
         cuda_version = getattr(torch.version, "cuda", None)
@@ -173,7 +185,7 @@ def _detect_torch() -> tuple:
         return str(getattr(torch, "__version__", None)), False, None
 
 
-def detect_hardware(cpu_tdp_w: Optional[float] = None) -> SystemInfo:
+def detect_hardware(cpu_tdp_w: float | None = None) -> SystemInfo:
     """Detect the host system's hardware and measurement capabilities.
 
     Args:

@@ -23,7 +23,7 @@ __version__ = "0.1.0"
 __all__ = ["Trainer", "__version__", "monitor"]
 
 if TYPE_CHECKING:  # pragma: no cover - import-time only for type checkers
-    from e2am.monitor import monitor
+    from e2am.monitoring import monitor
     from e2am.trainer import Trainer
 
 
@@ -35,7 +35,7 @@ def __getattr__(name: str) -> Any:
     installs work on machines without PyTorch.
     """
     if name == "monitor":
-        from e2am.monitor import monitor
+        from e2am.monitoring import monitor
 
         return monitor
     if name == "Trainer":

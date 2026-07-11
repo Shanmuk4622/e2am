@@ -10,7 +10,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Union
 
 import yaml
 from pydantic import BaseModel, Field, field_validator
@@ -24,7 +23,7 @@ WORLD_AVG_CARBON_INTENSITY = 475.0
 class CarbonConfig(BaseModel):
     """How carbon emissions are computed from energy."""
 
-    country_iso_code: Optional[str] = Field(
+    country_iso_code: str | None = Field(
         default=None,
         description="ISO 3166 country code (e.g. 'IND', 'USA') for region-aware intensity.",
     )
@@ -45,11 +44,11 @@ class MonitorConfig(BaseModel):
         le=60.0,
         description="Seconds between hardware samples.",
     )
-    gpu_indices: Optional[List[int]] = Field(
+    gpu_indices: list[int] | None = Field(
         default=None,
         description="GPUs to monitor (None = all detected GPUs).",
     )
-    cpu_tdp_w: Optional[float] = Field(
+    cpu_tdp_w: float | None = Field(
         default=None,
         gt=0,
         description="CPU TDP override in watts for energy estimation.",
@@ -69,7 +68,7 @@ class OutputConfig(BaseModel):
 
     @field_validator("dir", mode="before")
     @classmethod
-    def _coerce_path(cls, value: Union[str, Path]) -> Path:
+    def _coerce_path(cls, value: str | Path) -> Path:
         return Path(value)
 
 
@@ -77,7 +76,7 @@ class TrainerConfig(BaseModel):
     """Training loop behavior for :class:`e2am.Trainer`."""
 
     epochs: int = Field(default=10, ge=1)
-    device: Optional[str] = Field(
+    device: str | None = Field(
         default=None,
         description="Target device ('cuda', 'cuda:1', 'cpu'). None = auto-detect.",
     )
@@ -86,7 +85,7 @@ class TrainerConfig(BaseModel):
         description="Enable automatic mixed precision (torch.autocast + GradScaler).",
     )
     gradient_accumulation_steps: int = Field(default=1, ge=1)
-    max_grad_norm: Optional[float] = Field(
+    max_grad_norm: float | None = Field(
         default=None,
         gt=0,
         description="Clip gradients to this norm when set.",
@@ -98,12 +97,12 @@ class ExperimentConfig(BaseModel):
     """Top-level configuration for one experiment run."""
 
     project: str = Field(default="e2am", min_length=1)
-    run_name: Optional[str] = Field(
+    run_name: str | None = Field(
         default=None,
         description="Run identifier. None = auto ('<project>-<timestamp>').",
     )
-    seed: Optional[int] = None
-    tags: List[str] = Field(default_factory=list)
+    seed: int | None = None
+    tags: list[str] = Field(default_factory=list)
     notes: str = ""
     monitor: MonitorConfig = Field(default_factory=MonitorConfig)
     output: OutputConfig = Field(default_factory=OutputConfig)
@@ -125,7 +124,7 @@ class ExperimentConfig(BaseModel):
     # ------------------------------------------------------------------
 
     @classmethod
-    def from_yaml(cls, path: Union[str, Path]) -> "ExperimentConfig":
+    def from_yaml(cls, path: str | Path) -> ExperimentConfig:
         """Load a configuration from a YAML file.
 
         Args:
@@ -147,7 +146,7 @@ class ExperimentConfig(BaseModel):
         except Exception as exc:
             raise ConfigError(f"Invalid configuration in {path}: {exc}") from exc
 
-    def to_yaml(self, path: Union[str, Path]) -> Path:
+    def to_yaml(self, path: str | Path) -> Path:
         """Write this configuration to a YAML file and return the path."""
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -159,6 +158,6 @@ class ExperimentConfig(BaseModel):
         return path
 
 
-def load_config(path: Union[str, Path]) -> ExperimentConfig:
+def load_config(path: str | Path) -> ExperimentConfig:
     """Convenience wrapper for :meth:`ExperimentConfig.from_yaml`."""
     return ExperimentConfig.from_yaml(path)

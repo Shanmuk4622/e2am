@@ -7,7 +7,7 @@ name = "e2am"
 dynamic = ["version"]
 description = "E2AM — Energy Efficient AI Models: automatic energy, carbon, and performance profiling for AI training."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
     { name = "Satyanarayana", email = "satyanarayana.25phd7141@vitap.ac.in" },
@@ -29,7 +29,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -66,6 +65,7 @@ dev = [
     "isort>=5.13",
     "mypy>=1.8",
     "types-PyYAML",
+    "types-psutil",
     "pre-commit>=3.5",
 ]
 
@@ -89,7 +89,7 @@ packages = ["src/e2am"]
 
 [tool.black]
 line-length = 100
-target-version = ["py39"]
+target-version = ["py310"]
 
 [tool.isort]
 profile = "black"
@@ -98,10 +98,12 @@ known_first_party = ["e2am"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py39"
+target-version = "py310"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
+# The multiplication sign is used deliberately in docstrings (TDP × utilization).
+allowed-confusables = ["×"]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -121,7 +123,7 @@ ignore = [
 "tests/*" = ["B011"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 warn_unused_ignores = true
 warn_redundant_casts = true
 disallow_untyped_defs = true

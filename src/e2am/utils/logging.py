@@ -9,7 +9,6 @@ pollutes the user's own logging configuration.
 from __future__ import annotations
 
 import logging
-from typing import Optional, Union
 
 from rich.console import Console
 from rich.logging import RichHandler
@@ -37,7 +36,7 @@ def _configure_root() -> None:
     _configured = True
 
 
-def get_logger(name: Optional[str] = None) -> logging.Logger:
+def get_logger(name: str | None = None) -> logging.Logger:
     """Return an E2AM logger.
 
     Args:
@@ -55,7 +54,7 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
     return logging.getLogger(f"{_ROOT_NAME}.{name}")
 
 
-def set_verbosity(level: Union[int, str]) -> None:
+def set_verbosity(level: int | str) -> None:
     """Set the verbosity of all E2AM loggers.
 
     Args:
