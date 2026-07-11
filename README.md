@@ -49,7 +49,8 @@ accuracy metrics, plots, and reports land in `results/`.
 ## Installation
 
 ```bash
-pip install e2am
+pip install e2am            # once published; until then:
+pip install git+https://github.com/Shanmuk4622/e2am.git
 ```
 
 > **Note:** PyTorch is not installed automatically — install the build matching your
