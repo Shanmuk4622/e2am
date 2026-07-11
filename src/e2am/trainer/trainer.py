@@ -293,6 +293,9 @@ class Trainer:
                 try:
                     self.result.save(run_dir)
                     self.config.to_yaml(run_dir / "config.yaml")
+                    from e2am.reports.generate import generate_run_artifacts
+
+                    generate_run_artifacts(self.result, run_dir, self.config.output)
                     logger.info("Run artifacts saved to %s", run_dir)
                 except Exception as save_exc:
                     logger.warning("Could not save run artifacts: %s", save_exc)

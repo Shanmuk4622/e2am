@@ -48,7 +48,6 @@ dependencies = [
     "PyYAML>=6.0",
     "nvidia-ml-py>=11.495.46",
     "numpy>=1.23",
-    "pandas>=1.5",
     "matplotlib>=3.6",
 ]
 
@@ -60,6 +59,7 @@ all = ["e2am[carbon,pdf,dashboard]"]
 dev = [
     "pytest>=7.4",
     "pytest-cov>=4.1",
+    "pandas>=1.5",
     "ruff>=0.4",
     "black>=24.0",
     "isort>=5.13",

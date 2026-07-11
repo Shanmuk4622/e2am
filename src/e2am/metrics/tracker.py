@@ -84,7 +84,11 @@ class MetricsTracker:
         }
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Export as a long-format DataFrame with columns step/metric/value."""
+        """Export as a long-format DataFrame with columns step/metric/value.
+
+        Requires pandas, which E2AM does not install by default
+        (``pip install pandas``).
+        """
         import pandas as pd
 
         rows = [

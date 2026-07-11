@@ -120,7 +120,7 @@ class monitor(ContextDecorator):
         return self.config.output.dir / self.run_name
 
     def save_artifacts(self) -> Path:
-        """Write ``metrics.json`` and ``config.yaml`` into the run directory."""
+        """Write metrics, config, plots, and reports into the run directory."""
         if self.result is None:
             raise RuntimeError("No result to save; the monitored block has not finished.")
         run_dir = self.run_dir
@@ -129,6 +129,9 @@ class monitor(ContextDecorator):
             self.result.model_dump_json(indent=2), encoding="utf-8"
         )
         self.config.to_yaml(run_dir / "config.yaml")
+        from e2am.reports.generate import generate_run_artifacts
+
+        generate_run_artifacts(self.result, run_dir, self.config.output)
         logger.info("Run artifacts saved to %s", run_dir)
         return run_dir
 

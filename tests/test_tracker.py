@@ -42,13 +42,42 @@ def test_latest_of_unlogged_is_none() -> None:
     assert MetricsTracker().latest("never") is None
 
 
-def test_to_dict_and_dataframe() -> None:
+def test_to_dict() -> None:
     t = MetricsTracker()
     t.log({"loss": 1.0}, step=0)
     t.log({"loss": 0.5}, step=1)
     d = t.to_dict()
     assert d["loss"]["values"] == [1.0, 0.5]
-    df = t.to_dataframe()
-    assert list(df.columns) == ["step", "metric", "value"]
-    assert len(df) == 2
-    assert df["value"].tolist() == [1.0, 0.5]
+    assert d["loss"]["steps"] == [0, 1]
+
+
+def test_to_dataframe_in_clean_subprocess() -> None:
+    """to_dataframe needs pandas; run it in a fresh interpreter.
+
+    In-process, pandas' pyarrow-backed strings can hit Windows DLL conflicts
+    when torch/matplotlib DLLs are already loaded by other tests — an
+    environment quirk, not E2AM behavior — so the pandas path is exercised in
+    a clean subprocess where only e2am and pandas are imported.
+    """
+    import subprocess
+    import sys
+
+    script = (
+        "from e2am.metrics import MetricsTracker\n"
+        "t = MetricsTracker()\n"
+        "t.log({'loss': 1.0}, step=0)\n"
+        "t.log({'loss': 0.5}, step=1)\n"
+        "df = t.to_dataframe()\n"
+        "assert list(df.columns) == ['step', 'metric', 'value']\n"
+        "assert df['value'].tolist() == [1.0, 0.5]\n"
+        "print('DATAFRAME_OK')\n"
+    )
+    proc = subprocess.run(
+        [sys.executable, "-c", script], capture_output=True, text=True, timeout=120
+    )
+    if proc.returncode != 0 and "ModuleNotFoundError" in proc.stderr:
+        import pytest
+
+        pytest.skip("pandas not installed")
+    assert proc.returncode == 0, proc.stderr
+    assert "DATAFRAME_OK" in proc.stdout
