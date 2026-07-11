@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "e2am-results",
+      "runtimeExecutable": "C:\\Users\\shanm\\dev\\envs\\cv_conda\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8765", "--directory", "results"],
+      "port": 8765
+    }
+  ]
+}

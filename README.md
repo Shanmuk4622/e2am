@@ -125,6 +125,30 @@ e2am dashboard                                  # local HTML dashboard of all ru
 define `get_model()` and, for training, `get_loaders()`; optionally
 `get_optimizer(model)` and `get_loss()`.
 
+## Plugins
+
+Every plugin is a Trainer callback — pass any combination:
+
+```python
+from e2am import Trainer
+from e2am.plugins import WandbPlugin, MLflowPlugin, TensorBoardPlugin, SlackPlugin
+
+trainer = Trainer(
+    model=model, optimizer=optimizer, train_loader=train_loader,
+    callbacks=[
+        WandbPlugin(entity="my-team"),          # pip install wandb
+        MLflowPlugin(experiment_name="green"),  # pip install mlflow
+        TensorBoardPlugin(),                    # pip install tensorboard
+        SlackPlugin("https://hooks.slack.com/services/..."),  # no extra deps
+    ],
+)
+```
+
+Slack/Discord notify on completion **and on failure** — including the final
+energy, carbon, and Green Score. Missing packages fail fast at construction
+with the pip command; network errors during training are logged, never raised.
+Write your own by subclassing `e2am.trainer.Callback`.
+
 ## Roadmap
 
 - [x] Hardware detection with energy-capability probing
@@ -135,7 +159,7 @@ define `get_model()` and, for training, `get_loaders()`; optionally
 - [x] Automatic plots + HTML/Markdown/PDF reports + leaderboard
 - [x] CLI (`hardware`, `train`, `benchmark`, `report`, `compare`, `dashboard`)
 - [x] Local HTML dashboard across runs
-- [ ] Plugin integrations (W&B, MLflow, TensorBoard, Slack/Discord)
+- [x] Plugin integrations (W&B, MLflow, TensorBoard, Slack/Discord)
 - [ ] Optimization engine (AMP, quantization, pruning, batch-size suggestions)
 - [ ] Distributed training support
 - [ ] Cloud dashboard & Hugging Face `transformers` integration
