@@ -102,8 +102,9 @@ target-version = "py310"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-# The multiplication sign is used deliberately in docstrings (TDP × utilization).
-allowed-confusables = ["×"]
+# Used deliberately in docstrings: multiplication sign (TDP × utilization),
+# en dash for numeric ranges (0–100).
+allowed-confusables = ["×", "–"]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
