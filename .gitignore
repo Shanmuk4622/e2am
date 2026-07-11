@@ -41,3 +41,4 @@ site/
 
 # Local claude settings
 .claude/settings.local.json
+.claude/launch.json
