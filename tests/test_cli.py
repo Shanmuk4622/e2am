@@ -46,6 +46,7 @@ def test_hardware_table_and_json() -> None:
 
 @pytest.mark.torch
 def test_train_command(tmp_path: Path) -> None:
+    pytest.importorskip("torch")
     from e2am.config.settings import ExperimentConfig
 
     script = tmp_path / "model.py"
@@ -67,6 +68,7 @@ def test_train_command(tmp_path: Path) -> None:
 
 @pytest.mark.torch
 def test_train_missing_factory_fails_cleanly(tmp_path: Path) -> None:
+    pytest.importorskip("torch")
     script = tmp_path / "broken.py"
     script.write_text("x = 1\n", encoding="utf-8")
     result = runner.invoke(app, ["train", str(script)])
@@ -76,6 +78,7 @@ def test_train_missing_factory_fails_cleanly(tmp_path: Path) -> None:
 
 @pytest.mark.torch
 def test_benchmark_command(tmp_path: Path) -> None:
+    pytest.importorskip("torch")
     script = tmp_path / "model.py"
     script.write_text(SCRIPT, encoding="utf-8")
     result = runner.invoke(
@@ -98,7 +101,9 @@ def test_benchmark_command(tmp_path: Path) -> None:
     assert "Energy / inference" in result.output
 
 
+@pytest.mark.torch
 def test_benchmark_bad_input_size(tmp_path: Path) -> None:
+    pytest.importorskip("torch")
     script = tmp_path / "model.py"
     script.write_text(SCRIPT, encoding="utf-8")
     result = runner.invoke(app, ["benchmark", str(script), "--input-size", "abc"])
