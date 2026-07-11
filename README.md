@@ -150,6 +150,21 @@ energy, carbon, and Green Score. Missing packages fail fast at construction
 with the pip command; network errors during training are logged, never raised.
 Write your own by subclassing `e2am.trainer.Callback`.
 
+## Hugging Face
+
+Already using `transformers.Trainer`? One callback adds full E2AM telemetry:
+
+```python
+from transformers import Trainer
+from e2am.integrations import E2AMCallback
+
+trainer = Trainer(
+    model=model, args=training_args, train_dataset=train_ds, eval_dataset=eval_ds,
+    callbacks=[E2AMCallback(project="bert-finetune")],
+)
+trainer.train()   # energy, carbon, green metrics + full E2AM reports in results/
+```
+
 ## Roadmap
 
 - [x] Hardware detection with energy-capability probing
@@ -162,8 +177,9 @@ Write your own by subclassing `e2am.trainer.Callback`.
 - [x] Local HTML dashboard across runs
 - [x] Plugin integrations (W&B, MLflow, TensorBoard, Slack/Discord)
 - [x] Optimization engine (`e2am optimize`: AMP, batch size, torch.compile, checkpointing, quantization, wasted-epoch detection with measured Wh savings)
+- [x] Hugging Face `transformers` integration (`E2AMCallback`)
 - [ ] Distributed training support
-- [ ] Cloud dashboard & Hugging Face `transformers` integration
+- [ ] Cloud dashboard
 
 ## Contributing
 
