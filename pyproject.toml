@@ -145,6 +145,7 @@ module = [
     "plotly.*",
     "reportlab.*",
     "pandas.*",
+    "transformers.*",
 ]
 ignore_missing_imports = true
 
