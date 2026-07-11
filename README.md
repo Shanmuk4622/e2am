@@ -4,6 +4,7 @@
 
 **Automatic energy, carbon, and performance profiling for AI training — with almost zero code changes.**
 
+[![PyPI](https://img.shields.io/pypi/v/e2am)](https://pypi.org/project/e2am/)
 [![CI](https://github.com/Shanmuk4622/e2am/actions/workflows/ci.yml/badge.svg)](https://github.com/Shanmuk4622/e2am/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -49,8 +50,7 @@ accuracy metrics, plots, and reports land in `results/`.
 ## Installation
 
 ```bash
-pip install e2am            # once published; until then:
-pip install git+https://github.com/Shanmuk4622/e2am.git
+pip install e2am
 ```
 
 > **Note:** PyTorch is not installed automatically — install the build matching your
