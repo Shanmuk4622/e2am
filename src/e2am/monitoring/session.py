@@ -13,6 +13,7 @@ from __future__ import annotations
 import threading
 import time
 from datetime import datetime, timezone
+from typing import Any
 
 from e2am.config.settings import MonitorConfig
 from e2am.exceptions import MonitorError
@@ -185,7 +186,7 @@ class MonitorSession:
     # Live access
     # ------------------------------------------------------------------
 
-    def snapshot(self) -> dict[str, object]:
+    def snapshot(self) -> dict[str, Any]:
         """Thread-safe view of running totals for live displays/callbacks.
 
         Returns:

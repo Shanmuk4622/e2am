@@ -1,24 +1,15 @@
-"""Drop-in training loop with automatic energy monitoring.
-
-The full :class:`Trainer` implementation is under active development. This
-placeholder keeps ``from e2am import Trainer`` importable (and typed) so the
-package is releasable at every commit; instantiating it points users to the
-working ``monitor()`` API in the meantime.
-"""
+"""Drop-in training loop with automatic Green AI telemetry (requires PyTorch)."""
 
 from __future__ import annotations
 
-from typing import Any
+from e2am.trainer.callbacks import Callback, EarlyStopping, LoggingCallback
+from e2am.trainer.result import TrainingResult
+from e2am.trainer.trainer import Trainer
 
-__all__ = ["Trainer"]
-
-
-class Trainer:
-    """Placeholder for the upcoming E2AM Trainer."""
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        raise NotImplementedError(
-            "e2am.Trainer is not available yet in this version. "
-            "Wrap your existing training loop with `with e2am.monitor(...):` "
-            "to get automatic energy, carbon, and utilization tracking today."
-        )
+__all__ = [
+    "Callback",
+    "EarlyStopping",
+    "LoggingCallback",
+    "Trainer",
+    "TrainingResult",
+]
