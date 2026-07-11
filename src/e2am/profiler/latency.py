@@ -80,21 +80,21 @@ def benchmark_latency(
     first_param = next(model.parameters(), None)
     if device is None:
         device = first_param.device if first_param is not None else torch.device("cpu")
-    device = torch.device(device)
+    resolved_device = torch.device(device)
 
     if sample_input is None:
         assert input_size is not None
         dtype = first_param.dtype if first_param is not None else torch.float32
-        sample_input = torch.randn(*input_size, device=device, dtype=dtype)
+        sample_input = torch.randn(*input_size, device=resolved_device, dtype=dtype)
     inputs = sample_input if isinstance(sample_input, tuple) else (sample_input,)
     first = inputs[0]
     batch_size = int(first.shape[0]) if isinstance(first, torch.Tensor) and first.dim() else 1
 
-    use_cuda = device.type == "cuda" and torch.cuda.is_available()
+    use_cuda = resolved_device.type == "cuda" and torch.cuda.is_available()
 
     def _sync() -> None:
         if use_cuda:
-            torch.cuda.synchronize(device)
+            torch.cuda.synchronize(resolved_device)
 
     was_training = model.training
     model.eval()
@@ -119,7 +119,7 @@ def benchmark_latency(
     result = LatencyResult(
         batch_size=batch_size,
         iterations=iterations,
-        device=str(device),
+        device=str(resolved_device),
         mean_ms=mean_ms,
         std_ms=statistics.stdev(timings_ms) if len(timings_ms) > 1 else 0.0,
         min_ms=ordered[0],
